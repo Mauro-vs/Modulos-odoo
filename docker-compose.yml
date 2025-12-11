@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
 #Definimos el servicio Web, en este caso Odoo
   web:
@@ -36,6 +34,9 @@ services:
       - POSTGRES_PASSWORD=odoo
       - POSTGRES_USER=odoo
       - POSTGRES_DB=postgres
+    # Exponemos Postgres al host para poder conectarnos desde fuera de Docker
+    ports:
+      - "5432:5432"
     # Mapeamos el directorio del contenedor "var/lib/postgresql/data" en un directorio "./volumesOdoo/dataPostgreSQL"
     # situado en el lugar donde ejecutemos "Docker compose"
     volumes:

@@ -6,9 +6,9 @@ class EstateProperty(models.Model):
     _description = "Estate Property"
 
     
-    name = fields.Char(string="Nombre Propiedad", required=True)
+    name = fields.Char(string="Titulo", required=True)
     cp = fields.Char(string="Código Postal")
-    date_availability = fields.Date(string="Fecha de Disponibilidad", default=fields.Date.today)
+    date_availability = fields.Date(string="Fecha de Disponibilidad", default=lambda self: fields.Date.add(fields.Date.today(), months=3))
     description = fields.Text(string="Descripción")
     expected_price = fields.Float(string="Precio Esperado", required=True)
     selling_price = fields.Float(string="Precio de Venta", readonly=True)
@@ -24,6 +24,37 @@ class EstateProperty(models.Model):
         ('E', 'Este'),
         ('W', 'Oeste')
     ], string="Orientación")
+
+    # Etiquetas (tags)
+    tag_ids = fields.Many2many(
+        "estate.property.tag",
+        string="Etiquetas",
+    )
+
+    # Relación con el tipo de propiedad
+    property_type_id = fields.Many2one(
+        "estate.property.type",
+        string="Tipo de propiedad",
+    )
+
+    # Relaciones con comprador y comercial
+    buyer_id = fields.Many2one(
+        "res.partner",
+        string="Comprador",
+        copy=False,
+    )
+    salesman_id = fields.Many2one(
+        "res.users",
+        string="Comercial",
+        default=lambda self: self.env.user,
+    )
+
+    # Ofertas relacionadas
+    offer_ids = fields.One2many(
+        "estate.property.offer",
+        "property_id",
+        string="Ofertas",
+    )
 
     active = fields.Boolean(default=True)
     state = fields.Selection(

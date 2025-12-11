@@ -1,7 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_raiz_inmobiliaria" name="Real Estate">
-        <menuitem id="menu_categoria_inmuebles" name="Inmuebles">
-            <menuitem id="menu_propiedades" action="estate_property_action"/>
+        <menuitem id="adversiments" name="Inmuebles">
+            <menuitem id="propiedades" action="estate_property_action"/>
+        </menuitem>
+        <menuitem id="settings" name="Settings">
+            <menuitem id="estate_property_types" action="estate_property_type"/>
+            <menuitem id="estate_property_tags_menu" action="estate_property_tags"/>
         </menuitem>
     </menuitem>
 </odoo>
