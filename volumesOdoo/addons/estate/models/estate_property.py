@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields
+from odoo import models, fields, api
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -25,37 +25,6 @@ class EstateProperty(models.Model):
         ('W', 'Oeste')
     ], string="Orientación")
 
-    # Etiquetas (tags)
-    tag_ids = fields.Many2many(
-        "estate.property.tag",
-        string="Etiquetas",
-    )
-
-    # Relación con el tipo de propiedad
-    property_type_id = fields.Many2one(
-        "estate.property.type",
-        string="Tipo de propiedad",
-    )
-
-    # Relaciones con comprador y comercial
-    buyer_id = fields.Many2one(
-        "res.partner",
-        string="Comprador",
-        copy=False,
-    )
-    salesman_id = fields.Many2one(
-        "res.users",
-        string="Comercial",
-        default=lambda self: self.env.user,
-    )
-
-    # Ofertas relacionadas
-    offer_ids = fields.One2many(
-        "estate.property.offer",
-        "property_id",
-        string="Ofertas",
-    )
-
     active = fields.Boolean(default=True)
     state = fields.Selection(
         selection=[
@@ -71,6 +40,59 @@ class EstateProperty(models.Model):
         default="new",
     )
 
+    best_offer = fields.Float(string="Mejor Oferta",compute="_compute_best_offer",readonly=True)
+    total_area = fields.Integer(string="Área Total", compute="_compute_total_area", readonly=True)
+
+
+     # RELACIONES
+    tag_ids = fields.Many2many(
+        "estate.property.tag",
+        string="Etiquetas",
+    )
+    property_type_id = fields.Many2one(
+        "estate.property.type",
+        string="Tipo de propiedad",
+    )
+    buyer_id = fields.Many2one(
+        "res.partner",
+        string="Comprador",
+        copy=False,
+    )
+    salesman_id = fields.Many2one(
+        "res.users",
+        string="Comercial",
+        default=lambda self: self.env.user,
+    )
+    offer_ids = fields.One2many(
+        "estate.property.offer",
+        "property_id",
+        string="Ofertas",
+    )
+
+    # FUNCIONES
+    @api.depends('offer_ids.price')
+    def _compute_best_offer(self):
+        for prop in self:
+            if prop.offer_ids:
+                prop.best_offer = max(prop.offer_ids.mapped('price'))
+            else:
+                prop.best_offer = 0.0
+
+    @api.depends('living_area', 'garden_area')
+    def _compute_total_area(self):
+        for prop in self:
+            prop.total_area = prop.living_area + (prop.garden_area or 0)
+    
+    @api.onchange('garden')
+    def _onchange_garden(self):
+        if self.garden:
+            self.garden_area = 10
+            self.garden_orientation = 'N'
+        else:
+            self.garden_area = 0
+            self.garden_orientation = None
+            
+    # CONSTRAINTS
     _sql_constraints = [
         (
             "check_expected_price",
