@@ -79,13 +79,6 @@ class EstatePropertyOffer(models.Model):
                 pid.buyer_id = False
                 pid.selling_price = 0
         return super(EstatePropertyOffer, self).reset_to_new()
-    
-    @api.constrains('price')
-    def _check_expected_price(self):
-        for record in self:
-            best_offer = record.property_id.expected_price
-            if best_offer and record.price < 0.9 * best_offer:
-                raise ValidationError(f"La oferta debe ser al menos el 90% de la mejor oferta.")
 
     # RESTRICCIONES
     _sql_constraints = [

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -39,6 +39,7 @@ class EstateProperty(models.Model):
         required=True,
         copy=False,
         default="new",
+        readonly=True,
     )
 
     best_offer = fields.Float(string="Mejor Oferta",compute="_compute_best_offer",readonly=True)
@@ -106,6 +107,13 @@ class EstateProperty(models.Model):
                 raise UserError("No se puede cancelar una propiedad vendida.")
             record.state = 'canceled'
         return True
+    
+    @api.constrains('expected_price', 'selling_price')
+    def _check_expected_price(self):
+        for record in self:
+            best_offer = record.expected_price
+            if best_offer and record.selling_price and record.selling_price < 0.9 * best_offer:
+                raise ValidationError(f"El precio de venta debe ser al menos el 90% del precio esperado.")
             
     #RESTRICCIONES
     _sql_constraints = [
