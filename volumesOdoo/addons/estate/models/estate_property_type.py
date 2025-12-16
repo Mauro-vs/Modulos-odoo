@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields
+from odoo import models, fields, api
 
 class EstatePropertyType(models.Model):
     _name = "estate.property.type"
@@ -16,3 +16,8 @@ class EstatePropertyType(models.Model):
     )
     offer_count = fields.Integer(string="Número de ofertas")
     active = fields.Boolean(string="Activo", default=True)
+
+    # RESTRICCIONES
+    _sql_constraints = [
+        ('name_unique', 'UNIQUE(name)', 'El nombre del tipo de propiedad debe ser único.'),
+    ]

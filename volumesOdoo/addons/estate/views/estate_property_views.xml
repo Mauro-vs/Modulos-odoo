@@ -22,15 +22,21 @@
                 <field name="living_area"/>
                 <field name="facades"/>
                 <filter name="postcode_group" context="{'group_by': 'cp'}" string="Group by Postcode"/>
+                <field name="state" invisible="1"/>
             </search>
         </field>
     </record>
 
+    <!-- Vista de formulario -->
     <record id="view_estate_property_form" model="ir.ui.view">
         <field name="name">estate.property.form</field>
         <field name="model">estate.property</field>
         <field name="arch" type="xml">
             <form string="Property">
+                <header>
+                    <button name="button_sold" type="object" string="Sold"/>
+                    <button name="button_cancel" type="object" string="Cancel"/>
+                </header>
                 <sheet>
                     <!-- Título grande con el nombre -->
                     <div>
@@ -43,6 +49,7 @@
                     <!-- Datos principales en dos columnas -->
                     <group>
                         <group>
+                            <field name="state"/>
                             <field name="property_type_id"/>
                             <field name="cp"/>
                             <field name="date_availability"/>
@@ -59,17 +66,21 @@
                     <notebook>
                         <!-- Descripción -->
                         <page string="Description">
+                        <group>
                             <group>
                                 <field name="description"/>
                                 <field name="bedrooms"/>
                                 <field name="living_area"/>
                                 <field name="facades"/>
+                            </group>
+                            <group>
                                 <field name="garage"/>
                                 <field name="garden"/>
                                 <field name="garden_area"/>
                                 <field name="garden_orientation"/>
                                 <field name="total_area"/>
                             </group>
+                        </group>
                         </page>
                         <!-- Otra información -->
                         <page string="Other Information">

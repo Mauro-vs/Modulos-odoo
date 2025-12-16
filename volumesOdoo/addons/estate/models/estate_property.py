@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class EstateProperty(models.Model):
     _name = "estate.property"
@@ -91,12 +92,23 @@ class EstateProperty(models.Model):
         else:
             self.garden_area = 0
             self.garden_orientation = None
+
+    def button_sold(self):
+        for record in self:
+            if record.state == 'canceled':
+                raise UserError("No se puede vender una propiedad cancelada.")
+            record.state = 'sold'
+        return True
+    
+    def button_cancel(self):
+        for record in self:
+            if record.state == 'sold':
+                raise UserError("No se puede cancelar una propiedad vendida.")
+            record.state = 'canceled'
+        return True
             
-    # CONSTRAINTS
+    #RESTRICCIONES
     _sql_constraints = [
-        (
-            "check_expected_price",
-            "CHECK(expected_price > 0)",
-            "Se espera que el precio sea mayor que 0.",
-        ),
+        ('expected_price_positive', 'CHECK(expected_price > 0)', 'El precio esperado debe ser mayor que cero.'),
+        ('selling_price_positive', 'CHECK(selling_price >= 0)', 'El precio de venta no puede ser negativo.'),
     ]
